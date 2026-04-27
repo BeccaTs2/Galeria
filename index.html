@@ -15,21 +15,38 @@
     --border: rgba(255, 0, 255, 0.3);
     }
     body {
-    background: var(--bg);
+    background: #000;
       font-family: 'Nunito', sans-serif;
     color: #fff;
     cursor: none;
   }
 
-  /* Scanlines Cyberpunk */
-  body::after {
-    content: "";
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-    background-size: 100% 3px, 3px 100%;
-    z-index: 500; pointer-events: none;
-    opacity: 0.3;
+  /* Fondo de Galaxia */
+  .galaxy-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -10;
+    background: radial-gradient(circle at center, #0a001a 0%, #000 100%);
+    overflow: hidden;
+  }
+
+  .nebula {
+    position: absolute;
+    width: 200%; height: 200%;
+    top: -50%; left: -50%;
+    background: 
+      radial-gradient(circle at 30% 30%, rgba(255, 0, 255, 0.12) 0%, transparent 40%),
+      radial-gradient(circle at 70% 70%, rgba(0, 243, 255, 0.12) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(156, 39, 176, 0.08) 0%, transparent 50%);
+    filter: blur(80px);
+    animation: nebulaFloat 30s infinite linear;
+  }
+
+  @keyframes nebulaFloat {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.1); }
+    100% { transform: rotate(0deg) scale(1); }
   }
 
   .magic-glow {
@@ -124,6 +141,22 @@
     visibility: hidden; /* Oculto hasta que inicie el efecto */
   }
 
+  /* Retículo HUD que sigue al ratón */
+  .mouse-hud {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--secondary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1000;
+    transition: transform 0.1s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mouse-hud::before { content: '+'; color: var(--secondary); font-size: 10px; }
+
   /* Cursor parpadeante estilo terminal */
   .cursor {
     display: inline-block;
@@ -146,10 +179,14 @@
 
   .heart { position: absolute; font-size: 15px; opacity: 0.4; animation: fall 8s linear infinite; top: -50px; color: var(--primary); }
   @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+
+  .star-galaxy { position: absolute; background: #fff; border-radius: 50%; pointer-events: none; }
   </style>
 </head>
 <body>
-  <div class="magic-glow"></div>
+  <div class="galaxy-bg">
+    <div class="nebula"></div>
+  </div>
   <div class="title">Becca´s Frames</div>
 
   <div class="stage">
@@ -167,27 +204,40 @@
     </div>
   </div>
 
+  <div class="mouse-hud" id="mouseHud"></div>
+
   <script>
+    let audioCtx;
+
     // Función para generar el sonido HUD de computadora
     function playHUDSound() {
       try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // Reutilizamos el contexto o lo creamos si no existe
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // Los navegadores bloquean el audio hasta que hay interacción
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
 
         oscillator.type = 'sine'; // Sonido suave
-        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Tono agudo inicial
-        oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.1); // Caída tipo HUD
+        oscillator.frequency.setValueAtTime(1200, audioCtx.currentTime); // Tono más agudo para el click
+        oscillator.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.05); // Caída rápida
 
         gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.01); // Volumen muy bajo (suave)
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
+        gainNode.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + 0.005); // Volumen muy bajo
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05);
 
         oscillator.connect(gainNode);
         gainNode.connect(audioCtx.destination);
 
         oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.2);
+        oscillator.stop(audioCtx.currentTime + 0.05);
       } catch (e) {
         console.log("Audio no soportado");
       }
@@ -209,15 +259,22 @@
 
       function type() {
         if (line < textContent.length) {
+          const colors = ['var(--primary)', 'var(--secondary)'];
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
           if (char < textContent[line].length) {
-            // Quitamos el cursor viejo, añadimos letra y ponemos cursor nuevo
-            p.innerHTML = p.innerHTML.replace('<span class="cursor"></span>', '') 
+            // Quitamos el cursor viejo y ponemos el nuevo con color aleatorio
+            p.innerHTML = p.innerHTML.replace(/<span class="cursor".*?><\/span>/g, '') 
                         + textContent[line][char] 
-                        + '<span class="cursor"></span>';
+                        + `<span class="cursor" style="background-color: ${randomColor}"></span>`;
+            
+            // Sincronizamos el sonido con cada letra
+            playHUDSound();
             char++;
             setTimeout(type, 40);
           } else {
-            p.innerHTML = p.innerHTML.replace('<span class="cursor"></span>', '') + '<br><span class="cursor"></span>';
+            p.innerHTML = p.innerHTML.replace(/<span class="cursor".*?><\/span>/g, '') 
+                        + `<br><span class="cursor" style="background-color: ${randomColor}"></span>`;
             line++;
             char = 0;
             setTimeout(type, 500); // Pausa entre líneas
@@ -227,8 +284,26 @@
       type();
     }
 
+    function createGalaxy() {
+      const galaxy = document.querySelector('.galaxy-bg');
+      for(let i=0; i<150; i++) {
+        const star = document.createElement('div');
+        const size = Math.random() * 2 + 1;
+        star.className = 'star-galaxy';
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.opacity = Math.random() * 0.7 + 0.3;
+        if(Math.random() > 0.8) {
+          star.style.animation = `blink ${Math.random() * 3 + 2}s infinite alternate`;
+        }
+        galaxy.appendChild(star);
+      }
+    }
+
     function createHearts() {
-      for(let i=0; i<15; i++) {
+      for(let i=0; i<10; i++) {
         const heart = document.createElement('div');
         heart.className = 'heart';
         heart.innerHTML = Math.random() > 0.5 ? '✦' : '✧';
@@ -239,12 +314,18 @@
     }
 
     let initialized = false;
+    const mouseHud = document.getElementById('mouseHud');
+
     document.addEventListener('mousemove', (e) => {
       // Inicializar sonido en el primer movimiento (bypass de políticas de navegador)
       if (!initialized) {
         playHUDSound();
         initialized = true;
       }
+
+      // Mover el HUD con suavizado
+      mouseHud.style.left = (e.clientX - 20) + 'px';
+      mouseHud.style.top = (e.clientY - 20) + 'px';
 
       const sparkle = document.createElement('div');
       sparkle.className = 'sparkle';
@@ -254,6 +335,7 @@
       setTimeout(() => sparkle.remove(), 800);
     });
 
+    createGalaxy();
     createHearts();
     window.onload = initTypewriter;
   </script>
