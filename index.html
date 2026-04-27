@@ -3,258 +3,155 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anime Personal Frame</title>
+  <title>Becca´s Frames — Catálogo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary: #b39ddb;
+      --secondary: #ff85a1;
+      --bg: #fcf4ff;
+      --surface: #ffffff;
+      --text: #4a148c;
+      --border: #e1bee7;
+      --radius: 20px;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; }
-
     body {
-      background: linear-gradient(135deg, #fdf2ff 0%, #ffeef8 50%, #f0faff 100%);
-      position: relative;
-      font-family: 'Nunito', 'Arial', sans-serif;
-      cursor: none; /* Ocultamos cursor para el efecto mágico */
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      line-height: 1.6;
     }
 
-    /* Borde mágico */
-    body::before {
-      content: '';
-      position: fixed; inset: 10px;
-      border: 2px solid rgba(186, 104, 200, 0.2);
-      border-radius: 30px;
-      pointer-events: none; z-index: 200;
-      box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.8);
-    }
-
-    /* Brillo de luna/sol suave */
-    .magic-glow {
-      position: absolute; top: -100px; left: 50%;
-      transform: translateX(-50%);
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
-      border-radius: 50%; pointer-events: none;
-    }
-
-    /* Título con estilo anime */
-    .title {
-      position: absolute; top: 25px; left: 50%;
-      transform: translateX(-50%);
-      font-size: clamp(1.5rem, 4vw, 2.5rem);
-      color: #9c27b0;
-      text-shadow: 2px 2px 0px #fff, 0 0 15px rgba(156, 39, 176, 0.2);
-      font-weight: 900;
-      z-index: 10; letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    /* Contenedor central */
-    .pika-stage {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      animation: float 4s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translate(-50%, -50%) translateY(0); }
-      50% { transform: translate(-50%, -50%) translateY(-15px); }
-    }
-
-    /* Marco del Personaje */
-    .pika-frame {
-      position: relative; z-index: 3;
-      width: 280px; height: 280px;
-      border-radius: 50%; overflow: hidden;
-      border: 6px solid #fff;
-      box-shadow: 0 0 20px rgba(186, 104, 200, 0.4);
-      display: flex; align-items: center; justify-content: center;
-      background: #fff;
-    }
-
-    /* Efecto de giro mágico detrás del marco */
-    .pika-stage::after {
-      content: '';
-      position: absolute; top: -10px;
-      width: 310px; height: 310px;
-      background: conic-gradient(from 0deg, transparent, #ba68c8, #ff85a1, transparent);
-      border-radius: 50%;
-      animation: rotateGlow 4s linear infinite;
-      filter: blur(8px);
-      z-index: 1;
-    }
-
-    @keyframes rotateGlow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    .pika-frame img {
-      width: 100%; height: 100%; object-fit: cover;
-      border-radius: 50%;
-    }
-
-    /* Insignia de Pedidos */
-    .status-badge {
-      position: absolute; top: 10px; right: -20px;
-      background: #e91e63; color: white;
-      padding: 5px 15px; border-radius: 20px;
-      font-size: 0.7rem; font-weight: 800;
-      box-shadow: 0 4px 10px rgba(233, 30, 99, 0.4);
-      z-index: 10; transform: rotate(15deg);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: rotate(15deg) scale(1); }
-      50% { transform: rotate(15deg) scale(1.1); }
-    }
-
-    /* SERVICIOS DEBAJO DE LA BURBUJA */
-    .services-text {
-      z-index: 300;
-      color: #7b1fa2;
-      font-size: 0.85rem;
-      line-height: 1.5;
-      letter-spacing: 1px;
+    header {
+      padding: 60px 20px;
       text-align: center;
-      opacity: 0.9;
-      text-shadow: 1px 1px 0px #fff;
-      transition: 0.3s;
+      background: linear-gradient(180deg, #f3e5f5 0%, var(--bg) 100%);
     }
 
-    .services-text:hover {
-      transform: scale(1.05);
-      opacity: 1;
+    h1 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 3rem;
+      color: var(--secondary);
+      text-shadow: 3px 3px 0px #fff;
+      margin-bottom: 10px;
     }
 
-    .services-text b { color: #e91e63; text-transform: uppercase; font-size: 0.75rem; display: block; margin-bottom: 4px; }
-
-    /* EFECTO CURSOR */
-    .sparkle {
-      position: fixed;
-      width: 6px; height: 6px;
-      background: #fff;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      box-shadow: 0 0 10px #ba68c8;
-      animation: sparkleAnim 0.8s linear forwards;
-    }
-
-    @keyframes sparkleAnim {
-      to { transform: scale(0) translateY(20px); opacity: 0; }
-    }
-
-    /* Corazones flotantes */
-    .heart {
-      position: absolute;
-      font-size: 20px; opacity: 0.6;
-      animation: fall 8s linear infinite;
-      top: -50px;
-    }
-
-    @keyframes fall {
-      to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
-    }
-
-    /* Estrellas brillantes */
-    .star {
-      position: absolute;
+    .services {
+      max-width: 800px;
+      margin: -30px auto 40px;
       background: white;
-      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-      animation: twinkle 2s infinite alternate;
+      padding: 20px;
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px rgba(179, 157, 219, 0.2);
+      text-align: center;
+      border: 2px dashed var(--border);
     }
 
-    @keyframes twinkle {
-      from { opacity: 0.3; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1.2); }
+    .services b { color: var(--secondary); text-transform: uppercase; font-size: 0.8rem; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      padding: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
     }
 
-    /* Suelo de flores */
-    .garden {
-      position: absolute; bottom: 0; width: 100%;
-      height: 100px;
-      background: linear-gradient(transparent, rgba(255, 182, 193, 0.4));
-      display: flex; justify-content: center; align-items: flex-end;
-      padding-bottom: 20px; gap: 10px;
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 15px;
+      border: 1px solid var(--border);
+      transition: transform 0.3s;
+      text-align: center;
     }
+
+    .card:hover { transform: translateY(-10px); }
+
+    .preview-box {
+      width: 100%;
+      height: 200px;
+      background: #eee;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      overflow: hidden;
+    }
+
+    .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 12px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn:hover { background: var(--secondary); }
+
+    .btn-view { background: #f3e5f5; color: var(--primary); margin-top: 5px; }
   </style>
 </head>
 <body>
 
-  <div class="magic-glow"></div>
-  <div class="title">Becca´s Frames</div>
+  <header>
+    <h1>Becca´s Frames</h1>
+    <p>Diseños exclusivos para tu Xat</p>
+  </header>
 
-  <!-- Marco Principal -->
-  <div class="pika-stage">
-    <div class="status-badge">OPEN</div>
-    <div class="pika-frame">
-      <img src="https://i.imgur.com/4ovF5ui.gif" alt="Frieren Anime" id="pikaImg" referrerpolicy="no-referrer">
-    </div>
-
-    <div class="services-text">
-      <b>Servicios Premium</b>
-      Frames Personalizados<br>
-      Webs de Juegos y más<br>
-      
-    </div>
+  <div class="services">
+    <b>Servicios Premium</b>
+    <p>Frames Personalizados • Webs de Juegos • Edición de GIFs Anime</p>
   </div>
 
-  <div class="garden" id="garden"></div>
+  <main class="grid" id="main-grid"></main>
 
   <script>
-    // Generar corazones aleatorios
-    function createHearts() {
-      for(let i=0; i<20; i++) {
-        const heart = document.createElement('div');
-        heart.className = 'heart';
-        heart.innerHTML = Math.random() > 0.5 ? '🌸' : '✨';
-        heart.style.left = Math.random() * 100 + 'vw';
-        heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
-        heart.style.animationDelay = (Math.random() * 5) + 's';
-        document.body.appendChild(heart);
-      }
-    }
+    // Base URL de tu GitHub Pages
+    const BASE_URL = "https://beccats2.github.io/Galeria";
 
-    // Generar estrellas
-    function createStars() {
-      for(let i=0; i<30; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        const size = Math.random() * 10 + 5;
-        star.style.width = size + 'px';
-        star.style.height = size + 'px';
-        star.style.top = Math.random() * 60 + '%';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.animationDelay = Math.random() * 2 + 's';
-        document.body.appendChild(star);
+    const frames = [
+      { 
+        name: "Frieren Mágica", 
+        file: "anime-personal.html", 
+        thumb: "https://i.imgur.com/4ovF5ui.gif" 
+      },
+      { 
+        name: "Pikachu Clásico", 
+        file: "pikachu.html", 
+        thumb: "https://i.imgur.com/3pS9S6D.gif" 
       }
-    }
+    ];
 
-    // Efecto de cursor mágico
-    document.addEventListener('mousemove', (e) => {
-      const sparkle = document.createElement('div');
-      sparkle.className = 'sparkle';
-      sparkle.style.left = e.clientX + 'px';
-      sparkle.style.top = e.clientY + 'px';
-      document.body.appendChild(sparkle);
-      setTimeout(() => {
-        sparkle.remove();
-      }, 800);
+    const grid = document.getElementById('main-grid');
+
+    frames.forEach(f => {
+      const fullUrl = `${BASE_URL}/${f.file}`;
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="preview-box"><img src="${f.thumb}" referrerpolicy="no-referrer"></div>
+        <h3>${f.name}</h3>
+        <button class="btn" onclick="copyLink('${fullUrl}')">Copiar Link para Xat</button>
+        <a href="${f.file}" class="btn btn-view" target="_blank">Previsualizar</a>
+      `;
+      grid.appendChild(card);
     });
 
-    // Cambiar la imagen si el usuario pasa una por URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const userImg = urlParams.get('img');
-    if(userImg) {
-      document.getElementById('pikaImg').src = userImg;
+    function copyLink(url) {
+      navigator.clipboard.writeText(url);
+      alert("¡URL absoluta copiada! Ya puedes pegarla en tu Xat.");
     }
-
-    createHearts();
-    createStars();
   </script>
 </body>
 </html>
